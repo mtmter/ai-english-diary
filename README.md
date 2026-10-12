@@ -26,8 +26,8 @@ Client IDとClient secretを `.env.local` に記入します。
 DBへマイグレーションを適用し、Prisma Clientを生成して起動します。
 
 ```bash
-npx prisma migrate deploy --config prisma7.config.ts
-npx prisma generate --config prisma7.config.ts
+npm run db:migrate:deploy
+npm run db:generate
 npm run dev
 ```
 
@@ -52,3 +52,33 @@ npm run build
 ```
 
 Prismaの設定ファイル名は `prisma7.config.ts` なので、CLI実行時に `--config` を指定します。
+
+## Vercelへのデプロイ
+
+`npm install` / `npm ci` の後に `postinstall` がPrisma Clientを自動生成します。
+VercelのBuild Commandは `npm run build` を使います。
+
+1. VercelにGitHubリポジトリをインポートします。
+2. Vercel MarketplaceのPrisma Postgresを作成し、このプロジェクトへ接続します。
+   接続済みのDBがある場合は再利用してください。`DATABASE_URL` は接続時に設定されます。
+   ローカルの `localhost:51214` のDBはVercelから接続できません。
+3. VercelのProduction環境に `OPENAI_API_KEY`、`AUTH_SECRET`、
+   `AUTH_GITHUB_ID`、`AUTH_GITHUB_SECRET` を設定します。
+4. 本番用のGitHub OAuth Appを作成し、Homepage URLを本番URL、
+   Authorization callback URLを `https://本番ドメイン/api/auth/callback/github` に設定します。
+   手順3のGitHub設定値には、この本番用Appの値を使ってください。
+5. 本番の `DATABASE_URL` を環境変数に設定したターミナルで、以下を実行します。
+   接続先が本番DBであることを確認してください。CLIは `.env` を読み込みますが、
+   シェルで設定した `DATABASE_URL` が優先されます。
+
+   ```bash
+   npm run db:migrate:deploy
+   ```
+
+6. Vercelでデプロイし、本番URLでログイン、日記の保存、履歴表示を確認します。
+
+マイグレーションはデプロイ前に別途適用します。`postinstall` と `build` はDBを変更しません。
+DBやOAuthの秘密情報はGitへコミットしないでください。
+
+参考: [Prisma ORM 7のVercel設定](https://www.prisma.io/docs/guides/postgres/vercel)、
+[Auth.jsのGitHub OAuth設定](https://authjs.dev/guides/configuring-github)。

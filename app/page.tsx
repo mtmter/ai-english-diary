@@ -10,14 +10,36 @@ export default function Home() {
 
   const [diary, setDiary] = useState("");
   const [result, setResult] = useState<Result | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setResult({
-      score: 80,
-      feedback: `Good job!`,
-    });
+    if (isLoading) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/score", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ diary }),
+      });
+
+      if (!response.ok) {
+        throw new Error("採点に失敗しました...");
+      }
+
+      const data: Result = await response.json();
+      setResult(data);
+    } catch (error) {
+      console.error(error);
+      alert("採点に失敗しました...");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -38,7 +60,9 @@ export default function Home() {
           value={diary}
           onChange={(e) => setDiary(e.target.value)}
         />
-        <button>採点する</button>
+        <button disabled={isLoading || diary.trim() === ""}>
+          {isLoading ? "ちょっと待ってね" : "採点する"}
+        </button>
       </form>
 
       {result !== null && (

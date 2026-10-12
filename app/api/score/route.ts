@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -17,6 +18,12 @@ const RequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return Response.json({ error: "ログインしてください" }, { status: 401 });
+    }
+
     const body = await request.json();
     const parsed = RequestSchema.safeParse(body);
 
@@ -31,7 +38,7 @@ export async function POST(request: Request) {
       expressions.find((expression) => expression.id === id),
     );
 
-    if (selectedExpressions.some((expression) => expression === undefined)) {
+    if (!selectedExpressions.every((expression) => expression !== undefined)) {
       return Response.json({ error: "表現が存在しませーん" }, { status: 400 });
     }
 
@@ -174,6 +181,7 @@ ${diary}
           correctedDiary: result.correctedDiary,
           grammarScore: result.grammar.score,
           naturalnessScore: result.naturalness.score,
+          userId: session.user.id,
         },
       });
     }

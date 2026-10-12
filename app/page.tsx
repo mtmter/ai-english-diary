@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 
-export default function Home() {
-  type Result = {
-    score: number;
-    feedback: string;
-  };
+type Result = {
+  score: number;
+  feedback: string;
+};
 
+export default function Home() {
   const [diary, setDiary] = useState("");
   const [result, setResult] = useState<Result | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +18,7 @@ export default function Home() {
     if (isLoading) return;
 
     setIsLoading(true);
+    setResult(null);
 
     try {
       const response = await fetch("/api/score", {
@@ -44,7 +45,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>AI Englinsh Diary</h1>
+      <h1>AI English Diary</h1>
 
       <h2>Today's expressions</h2>
       <ul>

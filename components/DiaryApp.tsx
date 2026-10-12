@@ -47,6 +47,13 @@ export default function DiaryApp({ initialExpressions }: Props) {
     }
   }
 
+  const hasMissing =
+    result?.expressionResults.some(
+      (expression) => expression.status === "missing",
+    ) ?? false;
+
+  const isCompleted = result !== null && !hasMissing;
+
   return (
     <div>
       <h1>AI English Diary</h1>
@@ -60,29 +67,31 @@ export default function DiaryApp({ initialExpressions }: Props) {
         ))}
       </ul>
 
-      <form onSubmit={handleSubmit}>
-        <textarea
-          rows={5}
-          cols={80}
-          value={diary}
-          onChange={(e) => setDiary(e.target.value)}
-        />
-        <button disabled={isLoading || diary.trim() === ""}>
-          {isLoading ? "ちょっと待ってね" : "採点する"}
-        </button>
-      </form>
+      {!isCompleted ? (
+        <div>
+          <h2>Write your diary ↓</h2>
+          <form onSubmit={handleSubmit}>
+            <textarea
+              rows={5}
+              cols={80}
+              value={diary}
+              onChange={(e) => setDiary(e.target.value)}
+            />
+            <button disabled={isLoading || diary.trim() === ""}>
+              {isLoading ? "ちょっと待ってね" : "採点する"}
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div>
+          <h2>Your diary</h2>
+          <p>{diary}</p>
+        </div>
+      )}
 
       {result !== null && (
         <div>
-          <h2>Evaluation</h2>
-
-          <h3>Grammar: {result.grammar.score} / 5</h3>
-          <p>{result.grammar.feedback}</p>
-
-          <h3>Naturalness: {result.naturalness.score} / 5</h3>
-          <p>{result.naturalness.feedback}</p>
-
-          <h3>Expressions</h3>
+          <h2>Expressions</h2>
 
           <ul>
             {result.expressionResults.map((expression) => (
@@ -93,8 +102,20 @@ export default function DiaryApp({ initialExpressions }: Props) {
             ))}
           </ul>
 
-          <h3>Corrected diary</h3>
-          <p>{result.correctedDiary}</p>
+          {!hasMissing && (
+            <>
+              <h2>Evaluation</h2>
+
+              <h3>Grammar: {result.grammar.score} / 5</h3>
+              <p>{result.grammar.feedback}</p>
+
+              <h3>Naturalness: {result.naturalness.score} / 5</h3>
+              <p>{result.naturalness.feedback}</p>
+
+              <h3>Corrected diary</h3>
+              <p>{result.correctedDiary}</p>
+            </>
+          )}
         </div>
       )}
     </div>

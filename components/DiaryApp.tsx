@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
+import type { Expression } from "@/data/expressions";
+import type { Evaluation } from "@/lib/evaluation";
 
-type Result = {
-  score: number;
-  feedback: string;
+type Props = {
+  initialExpressions: Expression[];
 };
 
-export default function DiaryApp({ initialExpressions }) {
+export default function DiaryApp({ initialExpressions }: Props) {
   const [diary, setDiary] = useState("");
-  const [result, setResult] = useState<Result | null>(null);
+  const [result, setResult] = useState<Evaluation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedExpressions, setSelectedExpressions] =
-    useState(initialExpressions);
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,14 +27,17 @@ export default function DiaryApp({ initialExpressions }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ diary }),
+        body: JSON.stringify({
+          diary,
+          expressionIds: initialExpressions.map((expression) => expression.id),
+        }),
       });
 
       if (!response.ok) {
         throw new Error("採点に失敗しました...");
       }
 
-      const data: Result = await response.json();
+      const data: Evaluation = await response.json();
       setResult(data);
     } catch (error) {
       console.error(error);
@@ -51,7 +53,7 @@ export default function DiaryApp({ initialExpressions }) {
 
       <h2>Today's expressions</h2>
       <ul>
-        {selectedExpressions.map((expression) => (
+        {initialExpressions.map((expression) => (
           <li key={expression.id}>
             {expression.phrase}：{expression.meaning}
           </li>
@@ -72,8 +74,27 @@ export default function DiaryApp({ initialExpressions }) {
 
       {result !== null && (
         <div>
-          <p>Score: {result.score}</p>
-          <p>Feedback: {result.feedback}</p>
+          <h2>Evaluation</h2>
+
+          <h3>Grammar: {result.grammar.score} / 5</h3>
+          <p>{result.grammar.feedback}</p>
+
+          <h3>Naturalness: {result.naturalness.score} / 5</h3>
+          <p>{result.naturalness.feedback}</p>
+
+          <h3>Expressions</h3>
+
+          <ul>
+            {result.expressionResults.map((expression) => (
+              <li key={expression.id}>
+                {expression.id}: {expression.status}
+                <p>{expression.feedback}</p>
+              </li>
+            ))}
+          </ul>
+
+          <h3>Corrected diary</h3>
+          <p>{result.correctedDiary}</p>
         </div>
       )}
     </div>

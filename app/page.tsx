@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import Link from "next/link";
 import { auth, signIn, signOut } from "@/auth";
 import DiaryApp from "@/components/DiaryApp";
 import { expressions } from "@/data/expressions";
@@ -33,6 +34,9 @@ export default async function Home() {
   return (
     <main>
       <p>{session.user.name ?? "ユーザー"} としてログイン中</p>
+      <p>
+        <Link href="/diaries">日記の履歴を見る</Link>
+      </p>
       <form
         action={async () => {
           "use server";

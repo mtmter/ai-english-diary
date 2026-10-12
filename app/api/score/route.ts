@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import OpenAI from "openai";
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
@@ -156,13 +157,31 @@ ${diary}
     const result = response.output_parsed;
 
     if (result === null) {
-      return Response.json({ error: "No grading result" }, { status: 502 });
+      return Response.json(
+        { error: "評価がnullでかえってきたぜ" },
+        { status: 502 },
+      );
+    }
+
+    const hasMissing = result.expressionResults.some(
+      (expression) => expression.status === "missing",
+    );
+
+    if (!hasMissing) {
+      await prisma.diary.create({
+        data: {
+          text: diary,
+          correctedDiary: result.correctedDiary,
+          grammarScore: result.grammar.score,
+          naturalnessScore: result.naturalness.score,
+        },
+      });
     }
 
     return Response.json(result);
   } catch (error) {
-    console.error("Grading error:", error);
+    console.error("採点エラー:", error);
 
-    return Response.json({ error: "Grading failed" }, { status: 500 });
+    return Response.json({ error: "評価失敗" }, { status: 500 });
   }
 }

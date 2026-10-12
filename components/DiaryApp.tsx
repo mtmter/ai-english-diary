@@ -55,7 +55,7 @@ export default function DiaryApp({ initialExpressions }: Props) {
       <ul>
         {initialExpressions.map((expression) => (
           <li key={expression.id}>
-            {expression.phrase}：{expression.meaning}
+            {expression.phrase}: {expression.meaning}
           </li>
         ))}
       </ul>

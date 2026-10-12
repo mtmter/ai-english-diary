@@ -17,7 +17,7 @@ const ExpressionResultSchema = z.object({
 export const EvaluationSchema = z.object({
   grammar: CriterionSchema,
   naturalness: CriterionSchema,
-  expressionResults: z.array(ExpressionResultSchema),
+  expressionResults: z.array(ExpressionResultSchema).length(3),
   correctedDiary: z.string(),
 });
 

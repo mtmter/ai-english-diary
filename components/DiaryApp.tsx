@@ -34,6 +34,10 @@ export default function DiaryApp({ initialExpressions }: Props) {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          alert("ログインの有効期限が切れました。もう一度ログインしてください。");
+          return;
+        }
         throw new Error("採点に失敗しました...");
       }
 
@@ -58,7 +62,7 @@ export default function DiaryApp({ initialExpressions }: Props) {
     <div>
       <h1>AI English Diary</h1>
 
-      <h2>Today's expressions</h2>
+      <h2>Today&apos;s expressions</h2>
       <ul>
         {initialExpressions.map((expression) => (
           <li key={expression.id}>

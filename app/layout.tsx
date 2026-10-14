@@ -1,6 +1,21 @@
 import "./globals.css";
 import Link from "next/link";
+import { Patrick_Hand, Yomogi } from "next/font/google";
 import { auth, signIn, signOut } from "@/auth";
+
+const patrickHand = Patrick_Hand({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-patrick-hand",
+});
+
+const yomogi = Yomogi({
+  weight: "400",
+  display: "swap",
+  preload: false,
+  variable: "--font-yomogi",
+});
 
 export default async function RootLayout({
   children,
@@ -10,9 +25,9 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${patrickHand.variable} ${yomogi.variable}`}>
       <body>
-        <header className="border-b border-gray-200">
+        <header className="border-b border-blue-200">
           <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4 px-4 py-4">
             <Link href="/" className="text-xl font-bold">
               AI English Diary

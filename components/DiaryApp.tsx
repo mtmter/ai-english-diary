@@ -75,7 +75,7 @@ export default function DiaryApp({ initialExpressions }: Props) {
           <form onSubmit={handleSubmit} className="flex flex-col items-start gap-4">
             <textarea
               rows={5}
-              className="w-full rounded border border-gray-300 p-3"
+              className="w-full rounded border border-blue-300 bg-white p-3"
               placeholder="Write your diary here..."
               value={diary}
               onChange={(e) => setDiary(e.target.value)}

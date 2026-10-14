@@ -60,10 +60,8 @@ export default function DiaryApp({ initialExpressions }: Props) {
 
   return (
     <div>
-      <h1>AI English Diary</h1>
-
-      <h2>Today&apos;s expressions</h2>
-      <ul>
+      <h1 className="mb-4 text-2xl font-bold">Today&apos;s expressions</h1>
+      <ul className="list-disc space-y-1 pl-6">
         {initialExpressions.map((expression) => (
           <li key={expression.id}>
             {expression.phrase}: {expression.meaning}
@@ -72,16 +70,21 @@ export default function DiaryApp({ initialExpressions }: Props) {
       </ul>
 
       {!isCompleted ? (
-        <div>
-          <h2>Write your diary ↓</h2>
-          <form onSubmit={handleSubmit}>
+        <div className="mt-8">
+          <h2 className="mb-4 text-xl font-semibold">Write your diary ↓</h2>
+          <form onSubmit={handleSubmit} className="flex flex-col items-start gap-4">
             <textarea
               rows={5}
-              cols={80}
+              className="w-full rounded border border-gray-300 p-3"
+              placeholder="Write your diary here..."
               value={diary}
               onChange={(e) => setDiary(e.target.value)}
             />
-            <button disabled={isLoading || diary.trim() === ""}>
+            <button
+              type="submit"
+              className="rounded border px-4 py-2 disabled:opacity-50"
+              disabled={isLoading || diary.trim() === ""}
+            >
               {isLoading ? "ちょっと待ってね" : "採点する"}
             </button>
           </form>
